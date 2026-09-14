@@ -58,6 +58,20 @@ function Normalize-PortRange([string]$p) {
     return $p.Replace(':', '-')
 }
 
+function Test-ValidPort([string]$portStr) {
+    if (-not $portStr) { return $true }
+    if ($portStr -match '^(\d+)-(\d+)$') {
+        $p1 = [long]$matches[1]
+        $p2 = [long]$matches[2]
+        return ($p1 -ge 1 -and $p1 -le 65535 -and $p2 -ge 1 -and $p2 -le 65535 -and $p1 -le $p2)
+    }
+    if ($portStr -match '^\d+$') {
+        $p = [long]$portStr
+        return ($p -ge 1 -and $p -le 65535)
+    }
+    return $false
+}
+
 function Parse-UfwRuleArgs([string[]]$argsList) {
     if (-not $argsList -or $argsList.Count -eq 0) {
         return $null
@@ -163,6 +177,12 @@ function Parse-UfwRuleArgs([string[]]$argsList) {
         }
     }
 
+    # Validate port range (1-65535)
+    if ($localPort -and -not (Test-ValidPort $localPort)) {
+        Write-Host "[ERROR] Invalid port or port range: '$localPort'. Valid ports are 1 to 65535." -ForegroundColor Red
+        return $null
+    }
+
     # Wenn kein Port spezifiziert wurde und RemoteAddress Any ist -> unvollständig
     if (-not $localPort -and $remoteAddress -eq "Any") {
         return $null
@@ -222,12 +242,12 @@ function Add-UfwFirewallRule($parsed, [string]$action) {
         }
 
         try {
-            New-NetFirewallRule @splat | Out-Null
+            New-NetFirewallRule @splat -ErrorAction Stop | Out-Null
             $color = if ($actionCmd -eq "Allow") { "Green" } else { "Magenta" }
             $fromInfo = if ($parsed.RemoteAddress -ne "Any") { " from $($parsed.RemoteAddress)" } else { "" }
             Write-Host "Rule added ($($parsed.Direction)): $portDisplay$fromInfo [$actionCmd]" -ForegroundColor $color
         } catch {
-            Write-Host "[ERROR] Failed to add firewall rule: $_" -ForegroundColor Red
+            Write-Host "[ERROR] Failed to add firewall rule: $($_.Exception.Message)" -ForegroundColor Red
         }
     }
 }
