@@ -1,0 +1,34 @@
+﻿name: Build & Release UFW Installer
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Inno Setup
+        uses: ErwinSilvis/Inno-Setup-Action@v1.1
+        with:
+          inno-version: '6.7.3'
+
+      - name: Compile Installer with Inno Setup
+        run: |
+          ISCC.exe installer.iss
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: dist/*.exe
+          generate_release_notes: true
