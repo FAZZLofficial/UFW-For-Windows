@@ -1,10 +1,10 @@
-﻿; Script generated for UFW for Windows Server
+; Script generated for UFW for Windows Server
 ; Compatible with Windows Server 2019, 2022, 2025 and Windows 10/11
 
 #define MyAppName "UFW for Windows Server"
 #define MyAppVersion "2.0.0"
-#define MyAppPublisher "Fazzl.dev"
-#define MyAppURL "https://github.com/FazzlDev/ufw-windows"
+#define MyAppPublisher "FAZZL"
+#define MyAppURL "https://github.com/FAZZLofficial/UFW-For-Windows"
 #define MyAppExeName "ufw.cmd"
 
 [Setup]
