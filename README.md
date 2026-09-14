@@ -25,7 +25,7 @@ Manage your Windows Server firewall rules with the exact same simple and intuiti
 ### 2. Unattended / Silent Installation (SysAdmins & Automation)
 Deploy silently across multiple servers using standard flags:
 ```cmd
-UFW-Windows-Setup-v2.0.0.exe /VERYSILENT /NORESTART
+UFW-Windows-Setup-v1.0.0.exe /VERYSILENT /NORESTART
 ```
 
 ### 3. Clean Uninstallation

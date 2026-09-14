@@ -441,7 +441,7 @@ switch ($cmdLower) {
     }
 
     "version" {
-        Write-Host "ufw (Windows Server Edition) 2.0.0" -ForegroundColor Cyan
+        Write-Host "ufw (Windows Server Edition) 1.0.0" -ForegroundColor Cyan
         Write-Host "Emulating Linux UFW for Windows Server 2019 / 2022 / 2025" -ForegroundColor DarkGray
     }
 
@@ -464,7 +464,7 @@ switch ($cmdLower) {
     }
 
     default {
-        Write-Host "UFW for Windows Server (Version 2.0.0)" -ForegroundColor Cyan
+        Write-Host "UFW for Windows Server (Version 1.0.0)" -ForegroundColor Cyan
         Write-Host ""
         Write-Host "Usage: ufw [--version] <command> [arguments]" -ForegroundColor White
         Write-Host ""
