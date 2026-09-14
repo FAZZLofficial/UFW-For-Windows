@@ -1,4 +1,4 @@
-﻿<p align="center">
+<p align="center">
   <img src="logo.jpg" alt="UFW for Windows" width="220" />
 </p>
 
@@ -9,7 +9,7 @@ A lightweight, native CLI emulation of Linux **UFW (Uncomplicated Firewall)** fo
 Manage your Windows Server firewall rules with the exact same simple and intuitive syntax you know and love from Ubuntu and Debian.
 
 [![Release](https://img.shields.io/github/v/release/FAZZLofficial/UFW-For-Windows?style=flat-square)](https://github.com/FAZZLofficial/UFW-For-Windows/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20Server%202019%20|%202022%20|%202025-blue?style=flat-square)](https://github.com/FAZZLofficial/UFW-For-Windows)
 
 ---
@@ -113,8 +113,6 @@ ufw reset
 - **Rule Isolation:** Every rule created by this tool is prefixed with `UFW-` in the Windows Defender Firewall. Native system rules remain completely untouched and safe.
 - **Speed:** Instant command-line execution through a lightweight `ufw.cmd` wrapper directly invoking the PowerShell logic.
 
----
-
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [GNU General Public License v3.0 (GPLv3)](LICENSE) - Copyright (c) 2026 FAZZL.
