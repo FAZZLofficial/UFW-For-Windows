@@ -113,6 +113,10 @@ ufw reset
 - **Rule Isolation:** Every rule created by this tool is prefixed with `UFW-` in the Windows Defender Firewall. Native system rules remain completely untouched and safe.
 - **Speed:** Instant command-line execution through a lightweight `ufw.cmd` wrapper directly invoking the PowerShell logic.
 
+## ⚖️ Disclaimer
+
+This project is an independent, clean-room CLI implementation inspired by the syntax of Canonical's Uncomplicated Firewall (UFW). It is not affiliated with, endorsed by, or associated with Canonical Ltd., Ubuntu, or Microsoft Corporation. Windows and Windows Defender are registered trademarks of Microsoft Corporation.
+
 ## 📄 License
 
 This project is licensed under the [GNU General Public License v3.0 (GPLv3)](LICENSE) - Copyright (c) 2026 FAZZL.

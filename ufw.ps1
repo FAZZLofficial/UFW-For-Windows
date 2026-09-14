@@ -1,9 +1,4 @@
-<#
-    UFW for Windows Server (2019, 2022, 2025)
-    Emulates Linux UFW (Uncomplicated Firewall) using Windows Defender Firewall cmdlets.
-#>
-
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter(Position = 0)]
     [string]$Command,
@@ -11,19 +6,11 @@ param(
     [Parameter(Position = 1, ValueFromRemainingArguments = $true)]
     [string[]]$Arguments
 )
-
-# -------------------------------------------------------------
-# 1. Administrator Check
-# -------------------------------------------------------------
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
     Write-Host "[ERROR] Administrator privileges are required. Please run your shell as Administrator." -ForegroundColor Red
     exit 1
 }
-
-# -------------------------------------------------------------
-# 2. Service Aliases Dictionary
-# -------------------------------------------------------------
 $Services = @{
     "ssh"        = @{ Port = "22"; Proto = "TCP" }
     "http"       = @{ Port = "80"; Proto = "TCP" }
@@ -49,10 +36,6 @@ $Services = @{
     "openvpn"    = @{ Port = "1194"; Proto = "UDP" }
     "wireguard"  = @{ Port = "51820"; Proto = "UDP" }
 }
-
-# -------------------------------------------------------------
-# 3. Parser Helpers
-# -------------------------------------------------------------
 function Normalize-PortRange([string]$p) {
     if (-not $p) { return "" }
     return $p.Replace(':', '-')
@@ -98,8 +81,6 @@ function Parse-UfwRuleArgs([string[]]$argsList) {
     }
 
     if ($tokens.Count -eq 0) { return $null }
-
-    # Optionale Richtung im ersten Token: "in" oder "out"
     $idx = 0
     if ($tokens[$idx].ToLower() -in @("in", "inbound")) {
         $direction = "Inbound"
@@ -108,8 +89,6 @@ function Parse-UfwRuleArgs([string[]]$argsList) {
         $direction = "Outbound"
         $idx++
     }
-
-    # Restliche Tokens parsen
     while ($idx -lt $tokens.Count) {
         $token = $tokens[$idx].ToLower()
 
@@ -145,7 +124,6 @@ function Parse-UfwRuleArgs([string[]]$argsList) {
             $idx++
             continue
         }
-        # Fallback 1: Service Alias (z.B. ssh, http, rdp)
         elseif ($Services.ContainsKey($token)) {
             $svc = $Services[$token]
             $localPort = $svc.Port
@@ -155,14 +133,12 @@ function Parse-UfwRuleArgs([string[]]$argsList) {
             $idx++
             continue
         }
-        # Fallback 2: Port/Proto Kurzform (z.B. 80/tcp, 7000:7010/udp)
         elseif ($token -match '^([\d\:\-]+)\/(tcp|udp)$') {
             $localPort = Normalize-PortRange $matches[1]
             $protocol = $matches[2].ToUpper()
             $idx++
             continue
         }
-        # Fallback 3: Nur Port (z.B. 80 oder 7000:7010)
         elseif ($token -match '^([\d\:\-]+)$') {
             $localPort = Normalize-PortRange $token
             if ($idx + 1 -lt $tokens.Count -and $tokens[$idx + 1].ToLower() -match '^(tcp|udp)$') {
@@ -176,14 +152,10 @@ function Parse-UfwRuleArgs([string[]]$argsList) {
             $idx++
         }
     }
-
-    # Validate port range (1-65535)
     if ($localPort -and -not (Test-ValidPort $localPort)) {
         Write-Host "[ERROR] Invalid port or port range: '$localPort'. Valid ports are 1 to 65535." -ForegroundColor Red
         return $null
     }
-
-    # Wenn kein Port spezifiziert wurde und RemoteAddress Any ist -> unvollständig
     if (-not $localPort -and $remoteAddress -eq "Any") {
         return $null
     }
@@ -197,10 +169,6 @@ function Parse-UfwRuleArgs([string[]]$argsList) {
         Comment       = $comment
     }
 }
-
-# -------------------------------------------------------------
-# 4. Rule Execution
-# -------------------------------------------------------------
 function Add-UfwFirewallRule($parsed, [string]$action) {
     $protocols = if ($parsed.Protocol -eq "BOTH") {
         if (-not $parsed.LocalPort) { @("Any") } else { @("TCP", "UDP") }
@@ -218,8 +186,6 @@ function Add-UfwFirewallRule($parsed, [string]$action) {
         
         $portDisplay = if ($parsed.LocalPort) { "$($parsed.LocalPort)/$p" } else { "$p" }
         $displayName = "UFW: $actionCmd $dirShort $portDisplay (From: $($parsed.RemoteAddress))"
-
-        # Vorhandene Regel mit demselben Namen entfernen
         Get-NetFirewallRule -Name $ruleName -ErrorAction SilentlyContinue | Remove-NetFirewallRule
 
         $splat = @{
@@ -361,10 +327,6 @@ function Show-UfwStatus([bool]$Numbered = $false) {
 
     $rows | Format-Table -AutoSize
 }
-
-# -------------------------------------------------------------
-# 5. Command Dispatcher
-# -------------------------------------------------------------
 $cmdLower = if ($Command) { $Command.ToLower() } else { "help" }
 
 switch ($cmdLower) {
@@ -403,14 +365,10 @@ switch ($cmdLower) {
             Write-Host "Usage: ufw delete <number> | ufw delete [allow|deny] <rule...>" -ForegroundColor Yellow
             exit 1
         }
-
-        # Check if first arg is an integer index: ufw delete 3
         if ($Arguments[0] -match '^\d+$') {
             Remove-UfwByIndex ([int]$Arguments[0])
             break
         }
-
-        # Check if first arg is allow/deny: ufw delete allow 80/tcp
         $actionArg = ""
         $remainingArgs = $Arguments
         if ($Arguments[0].ToLower() -in @("allow", "deny", "reject")) {
